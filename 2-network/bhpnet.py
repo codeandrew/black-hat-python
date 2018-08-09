@@ -17,8 +17,7 @@ def usage():
     print "BHP Net Tool"
     print 
     print "Usage: bhnet.py -t target_host -p port"
-    print "-l --listen              -listen on [host]:[port] for
-                                    incoming connections"
+    print "-l --listen              -listen on [host]:[port] for incoming connections"
     print "-e --execute=file_to_run -execute the given file upon receiving a connection"
     print "-c --command             - initialize a command shell"
     print "-u --upload=destination  - upon receiving a connection upload a file and write to [destination]"
@@ -40,7 +39,7 @@ def main():
     global upload_destination
     global target
 
-    if not len(sys.argv[1]):
+    if not len(sys.argv[1:]):
         usage()
 
     # read the commandline options
@@ -48,7 +47,7 @@ def main():
         opts, args = getopt.getopt(sys.argv[1], "hle:t:p:cu",
                 ["help", "listen", "execute","target", "port", "command", "upload"])
 
-    except getopt.GetoptError as err
+    except getopt.GetoptError as err:
         print str(err)
         usage()
 
