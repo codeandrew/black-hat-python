@@ -11,32 +11,35 @@ listen = False
 command = False
 upload = False
 execute = ""
-target = "" 
+target = ""
 upload_destination = ""
 port = 0
 
 def usage():
     print "BHP Net Tool"
-    print 
+    print
     print "Usage: bhnet.py -t target_host -p port"
     print "-l --listen              -listen on [host]:[port] for incoming connections"
     print "-e --execute=file_to_run -execute the given file upon receiving a connection"
     print "-c --command             - initialize a command shell"
     print "-u --upload=destination  - upon receiving a connection upload a file and write to [destination]"
-    print 
+    print
     print
     print "Examples: "
     print "bhpnet.py -t 192.168.0.1c -p 5555 -l -c"
     print "bhpnet.py -t 192.168.0.1c -p 5555 -l -u=c:\\target.exe"
     print "bhpnet.py -t 192.168.0.1c -p 5555 -l -e=c:\"cat /etc/passwd\""
     print "echo 'ABCDEFGHI' | bhpnet.py -t 192.168.11.12 -p 135"
-    
+
+    print "bhpnet.py -l -p 9999 -c"
+    print "bhpnet.py -t localhost -p 9999"
     sys.exit(0)
 
 
 def client_sender(buffer):
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    print "buffer(client_sender): " , buffer
 
     try:
         # connect to our target host 
@@ -45,6 +48,7 @@ def client_sender(buffer):
         if len(buffer):
 
             while True:
+                print "len(buffer)", len(buffer)
                 # now wait for data back
                 recv_len = 1
                 response = ""
@@ -83,12 +87,12 @@ def server_loop():
 
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.bind((target,port))
-
+        print "server_loop: " , server
         server.listen(5)
 
         while True:
             client_socket, addr = server.accept()
-
+            print "server_loop: (TRUE) " , client_socket
             # spin off a thread to handle our new client 
             client_thread = threading.Thread(target=client_handler, args=(client_socket,))
             client_thread.start()
@@ -114,9 +118,11 @@ def client_handler(client_socket):
     global execute
     global command
 
+    print "client_handler, client_socket: " ,  client_socket
+
     # check for upload
     if len(upload_destination):
-
+        print upload_destination
         # read in all of the bytes and write to our destination
         file_buffer = ""
         
@@ -151,6 +157,7 @@ def client_handler(client_socket):
 
     # now we go into another loop if a command shell was requested
     if command:
+        print "Command: ", command
 
         while True:
             # show simple prompt
