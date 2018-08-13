@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# coding=utf-8
 
 import sys
 import socket
@@ -82,7 +81,7 @@ def server_loop():
     if not len(target):
         target = "0.0.0.0"
 
-        server = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server.bind((target,port))
 
         server.listen(5)
@@ -183,8 +182,7 @@ def main():
 
     # read the commandline options
     try:
-        opts, args = getopt.getopt(sys.argv[1], "hle:t:p:cu",
-                ["help", "listen", "execute","target", "port", "command", "upload"])
+        opts, args = getopt.getopt(sys.argv[1:], "hle:t:p:cu", ["help", "listen", "execute","target", "port", "command", "upload"])
 
     except getopt.GetoptError as err:
         print str(err)
@@ -223,6 +221,7 @@ def main():
 
     if listen:
         server_loop()
+
 
 main()
 
