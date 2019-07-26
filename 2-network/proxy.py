@@ -4,13 +4,14 @@ import sys
 import socket
 import threading
 
+
 def server_loop(local_host,local_port,remote_host,remote_port,receive_first):
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
         server.bind((local_host,local_port))
     except:
-        print "[!!] Failed to listen on %s:%d % (local_host,local_port)
+        print "[!!] Failed to listen on %s:%d" % (local_host, local_port)
         print "[!!] Check for other listening sockets or correct permissions."
         sys.exit(0)
 
@@ -22,18 +23,18 @@ def server_loop(local_host,local_port,remote_host,remote_port,receive_first):
         client_socket, addr = server.accept()
 
         # print out the local connection information
-        print "[==>] Received incomming connection from %s:%d % (addr[0],addr[1])
+        print "[==>] Received incomming connection from %s:%d % (addr[0],addr[1]) "
 
-        # start a thread to talk to the remote host 
+        # start a thread to talk to the remote host
         proxy_thread = threading.Thread(target=proxy_handler, args=(client_socket,remote_host,remote_port,receive_first))
 
         proxy_thread.start()
 
+
 def proxy_handler(client_socket, remote_host, remote_port, receive_first):
-    
-    # connect to the remote host 
+    # connect to the remote host
     remote_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    remote_socket.connect((remote_host,remote_port))
+    remote_socket.connect((remote_host, remote_port))
 
     # receive data from the remote end if necessary
     if receive_first:
@@ -44,7 +45,7 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
         # send it to response handler
         remote_buffer = response_handler(remote_buffer)
 
-        # if we have data to send to our local client, send it 
+        # if we have data to send to our local client, send it
         if len(remote_buffer):
             print "[<==] Sending %d bytes to localhost." %len(remote_buffer)
             client_socket.send(remote_buffer)
@@ -53,7 +54,7 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
     # send to remote, send to local
     # rinse, wash, repeat
     while True:
-        # read from local host 
+        # read from local host
         local_buffer = receive_from(client_socket)
 
         if len(local_buffer):
@@ -67,14 +68,14 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
             remote_socket.send(local_buffer)
             print "[==>] Sent to remote."
 
-            # receive back the response 
+            # receive back the response
             remote_buffer = receive_from(remote_socket)
 
             if len(remote_buffer):
                 print "[<==] Received %d bytes from remote ." % len(remote_buffer)
                 hexdump(remote_buffer)
 
-                # send to our response handler 
+                # send to our response handler
                 remote_buffer = response_handler(remote_buffer)
 
                 # send the response to the local socket
@@ -90,33 +91,33 @@ def proxy_handler(client_socket, remote_host, remote_port, receive_first):
 
                 break
 
-def main():
 
+def main():
     # no fancy command line parsing here
     if len(sys.argv[1:]) != 5:
         print "Usage: ./proxy.py [localhost] [localport] [remotehost] [remoteport] [receivefirst]"
         print "Example: ./proxy.py 127.0.0.1 9000 10.12.132.1 9000 True"
 
-    # setup local listening parameters 
+    # setup local listening parameters
     local_host = sys.argv[1]
     local_port = int(sys.argv[2])
 
-    # setup remote target 
+    # setup remote target
     remote_host = sys.argv[3]
     remote_port = int(sys.argv[4])
 
-    # this tells our proxy to connect and receive data 
-    # before sending to the remote host 
+    # this tells our proxy to connect and receive data
+    # before sending to the remote host
 
     receive_first = sys.argv[5]
 
     if "True" in receive_first:
         receive_first = True
     else:
-        receive_first = False 
+        receive_first = False
 
-    # now spin up our listening socket 
-    server_loop(local_host,local_port,remote_host,remote_port,receive_first)
+    # now spin up our listening socket
+    server_loop(local_host, local_port, remote_host, remote_port, receive_first)
+
 
 main()
-
